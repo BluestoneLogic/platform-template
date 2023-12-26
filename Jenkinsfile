@@ -1,12 +1,12 @@
 def branchVariables = [
     "origin/testing": [
-        "serverURL": "https://dmp-kd-test.kinops.io/"
-        "slugName": "dmp-kd-test"
+        "serverURL": "https://dmp-kd-test.kinops.io/",
+        "slugName": "dmp-kd-test",
         "spaceName": "DMP-KD Test"
     ],
     "origin/dev": [
-        "serverURL": "https://bluestone-dev.kinops.io/"
-        "slugName": "bluestone-logic"
+        "serverURL": "https://bluestone-dev.kinops.io/",
+        "slugName": "bluestone-logic",
         "spaceName": "Bluestone Logic"
     ]
 ]
