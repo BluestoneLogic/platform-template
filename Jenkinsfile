@@ -23,8 +23,8 @@ pipeline {
                     image 'docker-registry.toolchain.c2il.org/factory/fortify-sca:latest'
                     args '''
                     -v ${workspace}:/opt/kinetic-configuration
-                    -e PROJECT_NAME="JBOX"
-                    -e PROJECT_VERSION="DMP Platform Template"
+                    -e PROJECT_NAME="JBOX DMP Platform Template"
+                    -e PROJECT_VERSION="0.1"
                     -e PATH="$PATH:/app/sca/bin:/app/scatools/bin:/usr/local/bin"
                     -u root
                     '''
