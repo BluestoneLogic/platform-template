@@ -1,11 +1,11 @@
 ---
 core:
   # server_url: https://<SPACE>.kinops.io  OR https://<SERVER_NAME>.com/kinetic/<SPACE_SLUG>
-  server_url: https://web-server.com
-  space_slug: <SPACE_SLUG>
-  space_name: <SPACE_NAME>
-  service_user_username: <USER_NAME>
-  service_user_password: <PASSWORD>
+  server_url: ${serverURL}
+  space_slug: ${slugName}
+  space_name: ${spaceName}
+  service_user_username: ${serviceUsername}
+  service_user_password: ${servicePassword}
 options:
   EXPORT:
     space:
@@ -83,9 +83,9 @@ options:
     - handle
 task:
   # server_url: https://<SPACE>.kinops.io/app/components/task   OR https://<SERVER_NAME>.com/kinetic-task
-  server_url: https://web-server.com
-  service_user_username: <USER_NAME>
-  service_user_password: <PASSWORD>
+  server_url: ${serverURL}/kinetic-task
+  service_user_username: ${serviceUsername}
+  service_user_password: ${servicePassword}
 http_options:
   log_level: info
   log_output: stderr
