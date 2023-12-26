@@ -44,10 +44,13 @@
 
 =end
 
-require 'logger'
+require 'logger'      #For System Logging
 require 'json'
-require 'optparse'
-require 'kinetic_sdk'
+require 'optparse'    #For argument parsing
+require 'kinetic_sdk' 
+require 'Find'        #For config list building
+require 'io/console'  #For password request
+require 'base64'      #For pwd encoding
 
 template_name = "platform-template"
 
@@ -62,29 +65,97 @@ end
 # Determine the Present Working Directory
 pwd = File.expand_path(File.dirname(__FILE__))
 
-ARGV << '-h' if ARGV.empty?
 
 # The options specified on the command line will be collected in *options*.
 options = {}
 OptionParser.new do |opts|
+  break if opts === '' #If no arguments provided, then break out and move to selection
+  #TODO - See if this can be more elegant or if this is the best we have
   opts.banner = "Usage: example.rb [options]"
-
   opts.on("-c", "--c CONFIG_FILE", "The Configuration file to use") do |config|
     options["CONFIG_FILE"] = config
   end
   
   # No argument, shows at tail.  This will print an options summary.
   # Try it and see!
-  opts.on_tail("-h", "--help", "Show this message") do
+  opts.on("-h", "--help", "Show this message") do
     puts opts
     exit
   end
+
 end.parse!
+
+
+#Configuration Selection
+def config_selection(config_folder_path, logger)
+
+  #Ensure config folder exists
+  if !File.directory?(config_folder_path)
+    logger.info "Config folder not found at #{config_folder_path}"
+    puts "Cannot find config folder!"
+    puts "Exiting..."
+    gets
+    exit
+  end
+
+  # #Determine Config file to use
+  config_exts = ['.yaml','.yml']
+  configArray = []
+  logger.info "Checking #{config_folder_path} for config files"
+  begin
+    Find.find("#{config_folder_path}/") do |file|
+      configArray.append(File.basename(file)) if config_exts.include?(File.extname(file)) && (File.basename(file).include?('export'))
+    end
+  rescue
+    #No config files found in config folder
+    logger.info "Error finding default config file path!"
+    puts "Cannot find config files in default path! (#{pwd})"
+    puts "Exiting script..."
+    gets
+    exit
+  end
+  logger.info "Found config files"
+
+  #Print config file options with number indicators to select
+  puts "Select your config file"
+  configArray.each_with_index do |cFile, index|
+    puts "#{index+1}) #{cFile}" 
+  end
+  logger.info "Select section"
+  begin
+    print "Selection (0 to repeat options): "
+    sel = gets.chomp.to_i
+    begin
+      if sel === 0
+        configArray.each_with_index do |cFile, index|
+          puts "#{index+1}) #{cFile}" 
+        end
+        next
+      end
+      configFile = configArray[sel-1]
+      logger.info "Option #{sel} - #{configFile}"
+      break
+    rescue
+      logger.info "Error selecting config file! Exiting..."
+      puts "Error selecting config file!"
+      puts "Exiting..."
+      gets
+      exit
+    end
+  end while true
+  return configFile
+end
+
+
+#End method
 
 # determine the directory paths
 platform_template_path = File.dirname(File.expand_path(__FILE__))
-core_path = File.join(platform_template_path, "core")
-task_path = File.join(platform_template_path, "task")
+config_folder_path = File.join(platform_template_path,'config')
+
+if options["CONFIG_FILE"].nil?
+  options["CONFIG_FILE"] = config_selection(config_folder_path, logger)
+end
 
 # ------------------------------------------------------------------------------
 # methods
@@ -122,7 +193,10 @@ file = "#{platform_template_path}/#{options['CONFIG_FILE']}"
 logger.info "Validating configuration file."
 begin
   if File.exist?(file) != true
-    raise "The file \"#{options['CONFIG_FILE']}\" does not exist."
+    file = "#{config_folder_path}/#{options['CONFIG_FILE']}"
+    if File.exist?(file) != true
+      raise "The file \"#{options['CONFIG_FILE']}\" does not exist in the base or config directories."
+    end
   end
 rescue => error
   logger.info error
@@ -139,6 +213,33 @@ rescue => error
 end
 logger.info "Configuration file passed validation."
 
+def SecurePWD(file,vars,pwdAttribute)
+  #If no pwd, then ask for one, otherwise take current string that was not found to be B64 and convert
+  if vars[pwdAttribute]["service_user_password"].nil?
+    password = IO::console.getpass "Enter Password(#{pwdAttribute}): "
+  else
+    password =vars[pwdAttribute]["service_user_password"]
+  end
+  enc = Base64.strict_encode64(password)
+  vars[pwdAttribute]["service_user_password"] = enc.to_s
+  File.open(file, 'w') {|f| f.write vars.to_yaml}
+  return password
+end
+##TODO - This didn't write correctly - It set first as a string in quotes, second as encoded
+##TODO - This didn't read a plaintext and encode for me
+
+#Setup secure pwd function - Checks for nil and prompts for pwd, then b64 encodes and writes to yml
+if !vars["core"]["service_user_password"].is_a?(String) || Base64.strict_encode64(Base64.decode64(vars["core"]["service_user_password"])) != vars["core"]["service_user_password"]
+  vars["core"]["service_user_password"] = SecurePWD(file,vars,"core")
+end
+if !vars["task"]["service_user_password"].is_a?(String) || Base64.strict_encode64(Base64.decode64(vars["task"]["service_user_password"])) != vars["task"]["service_user_password"]
+  vars["task"]["service_user_password"] = SecurePWD(file,vars,"task")
+end
+
+#Write PT pwds into local variable
+vars["core"]["service_user_password"] = Base64.decode64(vars["core"]["service_user_password"])
+vars["task"]["service_user_password"] = Base64.decode64(vars["task"]["service_user_password"])
+
 # Set http_options based on values provided in the config file.
 http_options = (vars["http_options"] || {}).each_with_object({}) do |(k,v),result|
   result[k.to_sym] = v
@@ -147,6 +248,24 @@ end
 # Set variables based on values provided in the config file.
 SUBMISSIONS_TO_EXPORT = vars["options"]["SUBMISSIONS_TO_EXPORT"]
 REMOVE_DATA_PROPERTIES = vars["options"]["REMOVE_DATA_PROPERTIES"]
+
+#Config exports folder exists, if not then create
+if !File.directory?(File.join(platform_template_path,"exports"))
+  Dir.mkdir(File.join(platform_template_path, "exports"))
+end
+
+#Setting core paths utilzing variables
+if !vars['core']['space_slug'].nil?
+  folderName = vars['core']['space_slug']
+elsif !vars['core']['space_name'].nil?
+  folderName = vars['core']['space_name']
+else
+  puts "No space slug or name provided! Please provide one in order to export..."
+  gets
+  exit
+end
+core_path = File.join(platform_template_path, "exports", folderName, "core")
+task_path = File.join(platform_template_path, "exports", folderName, "task")
 
 # Output the yml file config
 logger.info "Output of Configuration File: \r #{JSON.pretty_generate(vars)}"
@@ -205,6 +324,7 @@ logger.info "Validating connection to Cors and Task was Successful"
 # ------------------------------------------------------------------------------
 # core
 # ------------------------------------------------------------------------------
+
 
 logger.info "Removing files and folders from the existing \"#{template_name}\" template."
 FileUtils.rm_rf Dir.glob("#{core_path}/*")
@@ -307,7 +427,7 @@ logger.info "Exporting and writing submission data"
             # dir and file name to write attachment
             download_path = "#{download_dir}/#{File.join(".", attachment['name'])}"
             # url to retrieve the attachment
-            url = "#{attachment_base_url}/submissions/#{submission_id}/files/#{ERB::Util.url_encode(field)}/#{index}/#{ERB::Util.url_encode(attachment['name'])}"
+            url = URI.escape("#{attachment_base_url}/submissions/#{submission_id}/files/#{field}/#{index}/#{attachment['name']}")
             # retrieve and write attachment
             space_sdk.stream_download_to_file(download_path, url, {}, space_sdk.default_headers)
             # add the "path" key to indicate the attachment's location

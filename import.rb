@@ -82,8 +82,7 @@ raise OptionParser::MissingArgument if options["CONFIG_FILE"].nil?
 
 # determine the directory paths
 platform_template_path = File.dirname(File.expand_path(__FILE__))
-core_path = File.join(platform_template_path, "core")
-task_path = File.join(platform_template_path, "task")
+
 
 # ------------------------------------------------------------------------------
 # methods
@@ -117,6 +116,10 @@ elsif
   raise "Config file not found: #{file}"
 end
 
+#Setting core paths
+core_path = File.join(platform_template_path, "exports", vars['core']['old_space_slug'], "core")
+task_path = File.join(platform_template_path, "exports", vars['core']['old_space_slug'], "task")
+
 # Set http_options based on values provided in the config file.
 http_options = (vars["http_options"] || {}).each_with_object({}) do |(k,v),result|
   result[k.to_sym] = v
@@ -127,6 +130,14 @@ vars["options"] = !vars["options"].nil? ? vars["options"] : {}
 vars["options"]["delete"] = !vars["options"]["delete"].nil? ? vars["options"]["delete"] : false
 
 logger.info "Importing using the config: #{JSON.pretty_generate(vars)}"
+
+#Decode password to utilize
+def DecodePWD(pwdAttribute)
+  return Base64.decode64(pwdAttribute)
+end
+
+vars["core"]["service_user_password"] = DecodePWD(vars["core"]["service_user_password"])
+vars["task"]["service_user_password"] = DecodePWD(vars["task"]["service_user_password"])
 
 
 space_sdk = KineticSdk::Core.new({
