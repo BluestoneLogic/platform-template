@@ -80,6 +80,7 @@ pipeline {
                         sh '''
                         yum install @ruby:3.1 gettext -y
                         gem install bundler
+                        gem install rexml
 
                         bundle install
                         export serviceUsername=$CREDS_USR
