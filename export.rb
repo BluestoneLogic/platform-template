@@ -48,7 +48,7 @@ require 'logger'      #For System Logging
 require 'json'
 require 'optparse'    #For argument parsing
 require 'kinetic_sdk' 
-require 'Find'        #For config list building
+# require 'Find'        #For config list building
 require 'io/console'  #For password request
 require 'base64'      #For pwd encoding
 
@@ -103,7 +103,7 @@ def config_selection(config_folder_path, logger)
   configArray = []
   logger.info "Checking #{config_folder_path} for config files"
   begin
-    Find.find("#{config_folder_path}/") do |file|
+    find("#{config_folder_path}/") do |file|
       configArray.append(File.basename(file)) if config_exts.include?(File.extname(file)) && (File.basename(file).include?('export'))
     end
   rescue

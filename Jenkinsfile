@@ -85,7 +85,6 @@ pipeline {
                         bundle install
                         export serviceUsername=$CREDS_USR
                         export servicePassword=$(echo -n $CREDS_PSW | base64)
-                        echo $serviceUsername $CREDS_USR > test
 
                         envsubst < config/servername_environment_export_config.yml > config/export.yml
 
