@@ -57,7 +57,6 @@ pipeline {
                     image 'docker-registry.toolchain.c2il.org/factory/jbox/ubi8-metacop:latest'
                     args '''
                         -v ${workspace}:/opt/kinetic-configuration
-                        -e PATH="$PATH:/opt/node/node-v16.13.2-linux-x64/bin:/usr/sbin"
                         --network host
                         -u root
                     '''
@@ -79,7 +78,7 @@ pipeline {
                         }
                         echo "Running a build..."
                         sh '''
-                        which ruby
+                        yum install ruby
                         gem install bundler
 
                         bundle install
