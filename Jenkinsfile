@@ -78,7 +78,8 @@ pipeline {
                         }
                         echo "Running a build..."
                         sh '''
-                        yum install ruby -y
+                        yum install ruby@3.0 -y
+                        gem install bundler
 
                         bundle install
                         export serviceUsername=$CREDS_USR
