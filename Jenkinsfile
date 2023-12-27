@@ -79,6 +79,9 @@ pipeline {
                         }
                         echo "Running a build..."
                         sh '''
+                        which ruby
+                        gem install bundler
+
                         bundle install
                         export serviceUsername=$CREDS_USR
                         export servicePassword=$(echo -n $CREDS_PSW | base64)
