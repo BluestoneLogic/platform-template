@@ -78,13 +78,14 @@ pipeline {
                         }
                         echo "Running a build..."
                         sh '''
-                        yum module list ruby
                         yum install @ruby:3.1 -y
                         gem install bundler
+                        yum install gettext
 
                         bundle install
                         export serviceUsername=$CREDS_USR
                         export servicePassword=$(echo -n $CREDS_PSW | base64)
+                        echo $serviceUsername > test
 
                         envsubst < config/servername_environment_export_config.yml > config/export.yml
 
