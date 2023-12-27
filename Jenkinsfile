@@ -66,7 +66,7 @@ pipeline {
             }
 
             environment {
-                CREDS = credentials('kd-nick-credentials')
+                // CREDS = credentials('kd-nick-credentials')
             }
             stages{
                 stage('Build') {
