@@ -78,9 +78,8 @@ pipeline {
                         }
                         echo "Running a build..."
                         sh '''
-                        yum install @ruby:3.1 -y
+                        yum install @ruby:3.1 gettext -y
                         gem install bundler
-                        yum install gettext
 
                         bundle install
                         export serviceUsername=$CREDS_USR
