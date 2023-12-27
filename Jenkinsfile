@@ -78,7 +78,7 @@ pipeline {
                         }
                         echo "Running a build..."
                         sh '''
-                        yum install ruby
+                        yum install ruby -y
                         gem install bundler
 
                         bundle install
