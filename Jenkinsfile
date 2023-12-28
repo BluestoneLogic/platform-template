@@ -35,7 +35,6 @@ pipeline {
                FPRNAME = sh(script: 'date +"%Y%m%d%H%M%S".fpr', , returnStdout: true).trim()
             }
             steps {
-                cleanWs()
                 echo "Beginning Fortify scan..."
                 // steps for test here
                 // echo 'Delaying Fortify scan start for 5 minutes due to Comms Topology app network bandwidth'
@@ -48,6 +47,7 @@ pipeline {
                     sourceanalyzer -verbose -b srcbuild -exclude "/opt/kinetic-configuration/build/static/js/*.chunk.js" /opt/kinetic-configuration/**/* -Dcom.fortify.sca.limiters.MaxPassthroughChainDepth=8 -Dcom.fortify.sca.limiters.MaxChainDepth=8 -Dcom.fortify.sca.EnableDOMModeling=true
                     sourceanalyzer -verbose -b srcbuild -scan -f /opt/kinetic-configuration/$FPRNAME
                     fortifyclient -debug -url https://fortify.toolchain.c2il.org/ -authtoken $AUTHTOKEN uploadFPR -file /opt/kinetic-configuration/$FPRNAME -project "$PROJECT_NAME" -applicationVersion "$PROJECT_VERSION"
+                    cleanWs()
                     '''
                 }
             }
@@ -71,7 +71,6 @@ pipeline {
             stages{
                 stage('Build') {
                     steps {
-                        cleanWs()
                         script {
                             def branch = env.GIT_BRANCH
                             env.serverURL = branchVariables?.get(branch)?.serverURL
@@ -92,6 +91,7 @@ pipeline {
 
                         ruby ./export.rb -c config/export.yml
                         chmod -R 777 /opt/kinetic-configuration/export/* 
+                        cleanWs()
                         '''
                     }
                 }
