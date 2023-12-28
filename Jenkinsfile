@@ -23,7 +23,6 @@ pipeline {
                     image 'docker-registry.toolchain.c2il.org/factory/fortify-sca:latest'
                     args '''
                     -v ${workspace}:/opt/kinetic-configuration
-                    // --user "$(id -u):$(id -g)" -v /etc/passwd:/etc/passwd:ro
                     -e PROJECT_NAME="JBOX DMP Platform Template"
                     -e PROJECT_VERSION="0.1"
                     -e PATH="$PATH:/app/sca/bin:/app/scatools/bin:/usr/local/bin"
@@ -36,6 +35,7 @@ pipeline {
                FPRNAME = sh(script: 'date +"%Y%m%d%H%M%S".fpr', , returnStdout: true).trim()
             }
             steps {
+                cleanWs()
                 echo "Beginning Fortify scan..."
                 // steps for test here
                 // echo 'Delaying Fortify scan start for 5 minutes due to Comms Topology app network bandwidth'
@@ -43,7 +43,6 @@ pipeline {
                 // ! the latest fortify is on a rhel 8 minimal install, so uses microdnf instead of yum
                 withCredentials([string(credentialsId: 'fortify_authtoken', variable: 'AUTHTOKEN')]) {
                     sh '''
-                    rm -rf /opt/kinetic-configuration/*
                     cd /opt/kinetic-configuration
                     fortifyupdate
                     sourceanalyzer -verbose -b srcbuild -exclude "/opt/kinetic-configuration/build/static/js/*.chunk.js" /opt/kinetic-configuration/**/* -Dcom.fortify.sca.limiters.MaxPassthroughChainDepth=8 -Dcom.fortify.sca.limiters.MaxChainDepth=8 -Dcom.fortify.sca.EnableDOMModeling=true
@@ -59,7 +58,6 @@ pipeline {
                     image 'docker-registry.toolchain.c2il.org/factory/jbox/ubi8-metacop:latest'
                     args '''
                         -v ${workspace}:/opt/kinetic-configuration
-                        --user "$(id -u):$(id -g)" -v /etc/passwd:/etc/passwd:ro
                         --network host
                         -u root
                     '''
@@ -73,6 +71,7 @@ pipeline {
             stages{
                 stage('Build') {
                     steps {
+                        cleanWs()
                         script {
                             def branch = env.GIT_BRANCH
                             env.serverURL = branchVariables?.get(branch)?.serverURL
@@ -81,7 +80,6 @@ pipeline {
                         }
                         echo "Running a build..."
                         sh '''
-                        rm -rf /opt/kinetic-configuration/*
                         yum install @ruby:3.1 gettext -y
                         gem install bundler
                         gem install rexml
