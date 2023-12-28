@@ -57,6 +57,7 @@ pipeline {
                     image 'docker-registry.toolchain.c2il.org/factory/jbox/ubi8-metacop:latest'
                     args '''
                         -v ${workspace}:/opt/kinetic-configuration
+                        --user "$(id -u):$(id -g)" -v /etc/passwd:/etc/passwd:ro
                         --network host
                         -u root
                     '''
