@@ -35,6 +35,7 @@ pipeline {
                FPRNAME = sh(script: 'date +"%Y%m%d%H%M%S".fpr', , returnStdout: true).trim()
             }
             steps {
+                cleanWs()
                 echo "Beginning Fortify scan..."
                 // steps for test here
                 // echo 'Delaying Fortify scan start for 5 minutes due to Comms Topology app network bandwidth'
@@ -70,6 +71,7 @@ pipeline {
             stages{
                 stage('Build') {
                     steps {
+                        cleanWs()
                         script {
                             def branch = env.GIT_BRANCH
                             env.serverURL = branchVariables?.get(branch)?.serverURL
