@@ -89,6 +89,7 @@ pipeline {
                         envsubst < config/servername_environment_export_config.yml > config/export.yml
 
                         ruby ./export.rb -c config/export.yml
+                        chmod -R 777 /opt/kinetic-configuration/export/* 
                         '''
                     }
                 }
