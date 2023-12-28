@@ -23,7 +23,6 @@ pipeline {
                     image 'docker-registry.toolchain.c2il.org/factory/fortify-sca:latest'
                     args '''
                     -v ${workspace}:/opt/kinetic-configuration
-                    --user "$(id -u):$(id -g)" -v /etc/passwd:/etc/passwd:ro
                     -e PROJECT_NAME="JBOX DMP Platform Template"
                     -e PROJECT_VERSION="0.1"
                     -e PATH="$PATH:/app/sca/bin:/app/scatools/bin:/usr/local/bin"
@@ -58,7 +57,6 @@ pipeline {
                     image 'docker-registry.toolchain.c2il.org/factory/jbox/ubi8-metacop:latest'
                     args '''
                         -v ${workspace}:/opt/kinetic-configuration
-                        --user "$(id -u):$(id -g)" -v /etc/passwd:/etc/passwd:ro
                         --network host
                         -u root
                     '''
