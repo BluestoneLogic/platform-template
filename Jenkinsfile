@@ -17,40 +17,41 @@ pipeline {
         FPRNAME = sh(script: 'date +"%Y%m%d%H%M%S".fpr', , returnStdout: true).trim()
     }
     stages {
-        // stage('Fortify') {
-        //     agent {
-        //         docker {
-        //             image 'docker-registry.toolchain.c2il.org/factory/fortify-sca:latest'
-        //             args '''
-        //             -v ${workspace}:/opt/kinetic-configuration
-        //             -e PROJECT_NAME="JBOX DMP Platform Template"
-        //             -e PROJECT_VERSION="0.1"
-        //             -e PATH="$PATH:/app/sca/bin:/app/scatools/bin:/usr/local/bin"
-        //             -u root
-        //             '''
-        //             reuseNode true
-        //         }
-        //     }
-        //     environment {
-        //        FPRNAME = sh(script: 'date +"%Y%m%d%H%M%S".fpr', , returnStdout: true).trim()
-        //     }
-        //     steps {
-        //         echo "Beginning Fortify scan..."
-        //         // steps for test here
-        //         // echo 'Delaying Fortify scan start for 5 minutes due to Comms Topology app network bandwidth'
-        //         // sleep 480
-        //         // ! the latest fortify is on a rhel 8 minimal install, so uses microdnf instead of yum
-        //         withCredentials([string(credentialsId: 'fortify_authtoken', variable: 'AUTHTOKEN')]) {
-        //             sh '''
-        //             cd /opt/kinetic-configuration
-        //             fortifyupdate
-        //             sourceanalyzer -verbose -b srcbuild -exclude "/opt/kinetic-configuration/build/static/js/*.chunk.js" /opt/kinetic-configuration/**/* -Dcom.fortify.sca.limiters.MaxPassthroughChainDepth=8 -Dcom.fortify.sca.limiters.MaxChainDepth=8 -Dcom.fortify.sca.EnableDOMModeling=true
-        //             sourceanalyzer -verbose -b srcbuild -scan -f /opt/kinetic-configuration/$FPRNAME
-        //             fortifyclient -debug -url https://fortify.toolchain.c2il.org/ -authtoken $AUTHTOKEN uploadFPR -file /opt/kinetic-configuration/$FPRNAME -project "$PROJECT_NAME" -applicationVersion "$PROJECT_VERSION"
-        //             '''
-        //         }
-        //     }
-        // }
+        stage('Fortify') {
+            agent {
+                docker {
+                    image 'docker-registry.toolchain.c2il.org/factory/fortify-sca:latest'
+                    args '''
+                    -v ${workspace}:/opt/kinetic-configuration
+                    --user "$(id -u):$(id -g)" -v /etc/passwd:/etc/passwd:ro
+                    -e PROJECT_NAME="JBOX DMP Platform Template"
+                    -e PROJECT_VERSION="0.1"
+                    -e PATH="$PATH:/app/sca/bin:/app/scatools/bin:/usr/local/bin"
+                    -u root
+                    '''
+                    reuseNode true
+                }
+            }
+            environment {
+               FPRNAME = sh(script: 'date +"%Y%m%d%H%M%S".fpr', , returnStdout: true).trim()
+            }
+            steps {
+                echo "Beginning Fortify scan..."
+                // steps for test here
+                // echo 'Delaying Fortify scan start for 5 minutes due to Comms Topology app network bandwidth'
+                // sleep 480
+                // ! the latest fortify is on a rhel 8 minimal install, so uses microdnf instead of yum
+                withCredentials([string(credentialsId: 'fortify_authtoken', variable: 'AUTHTOKEN')]) {
+                    sh '''
+                    cd /opt/kinetic-configuration
+                    fortifyupdate
+                    sourceanalyzer -verbose -b srcbuild -exclude "/opt/kinetic-configuration/build/static/js/*.chunk.js" /opt/kinetic-configuration/**/* -Dcom.fortify.sca.limiters.MaxPassthroughChainDepth=8 -Dcom.fortify.sca.limiters.MaxChainDepth=8 -Dcom.fortify.sca.EnableDOMModeling=true
+                    sourceanalyzer -verbose -b srcbuild -scan -f /opt/kinetic-configuration/$FPRNAME
+                    fortifyclient -debug -url https://fortify.toolchain.c2il.org/ -authtoken $AUTHTOKEN uploadFPR -file /opt/kinetic-configuration/$FPRNAME -project "$PROJECT_NAME" -applicationVersion "$PROJECT_VERSION"
+                    '''
+                }
+            }
+        }
         stage('Docker Build and Deploy') {
             agent {
                 docker{
