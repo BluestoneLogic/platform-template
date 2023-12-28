@@ -26,7 +26,7 @@ pipeline {
                     -e PROJECT_NAME="JBOX DMP Platform Template"
                     -e PROJECT_VERSION="0.1"
                     -e PATH="$PATH:/app/sca/bin:/app/scatools/bin:/usr/local/bin"
-                    --user "$(id -u):$(id -g)" -v /etc/passwd:/etc/passwd:ro
+                    -u root
                     '''
                     reuseNode true
                 }
@@ -59,7 +59,7 @@ pipeline {
                     args '''
                         -v ${workspace}:/opt/kinetic-configuration
                         --network host
-                        --user "$(id -u):$(id -g)" -v /etc/passwd:/etc/passwd:ro
+                        -u root
                     '''
                     reuseNode true
                 }
