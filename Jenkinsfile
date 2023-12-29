@@ -131,7 +131,8 @@ pipeline {
                 sh '''
                 pwd
                 whoami
-                chmod -R 766 \'*\'
+                ls -l
+                chmod -R 766 *
                 '''
                 }
                 docker.image('docker-registry.toolchain.c2il.org/factory/fortify-sca:latest').inside("-u root") {
@@ -139,7 +140,8 @@ pipeline {
                 sh '''
                 pwd
                 whoami
-                chmod -R 766 \'*\'
+                ls -l
+                chmod -R 766 *
                 '''
                 }
             }
