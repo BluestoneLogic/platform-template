@@ -114,7 +114,8 @@ pipeline {
                         }
                         // upload
                         sh '''
-                         aws s3 cp --recursive /opt/kinetic-configuration/export ${BUCKET_NAME} --region us-gov-west-1
+                        aws s3 cp --recursive /opt/kinetic-configuration/exports ${BUCKET_NAME} --region us-gov-west-1
+                        rm -rf /data/workspace/JBOX/kinetic-configuration/
                         '''
                     }
                 }
