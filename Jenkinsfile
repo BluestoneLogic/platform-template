@@ -78,6 +78,7 @@ pipeline {
                         }
                         echo "Running a build..."
                         sh '''
+                        cd /opt/kinetic-configuration
                         yum install @ruby:3.1 gettext -y
                         gem install bundler
                         gem install rexml
