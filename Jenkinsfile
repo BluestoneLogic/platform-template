@@ -90,7 +90,7 @@ pipeline {
                         envsubst < config/servername_environment_export_config.yml > config/export.yml
 
                         ruby ./export.rb -c config/export.yml
-                        chmod -R 777 ./export/* 
+                        chmod -R 777 ./exports/* 
                         '''
                     }
                 }
@@ -127,12 +127,14 @@ pipeline {
                 docker.image('docker-registry.toolchain.c2il.org/factory/jbox/ubi8-metacop:latest').inside("-u root") {
                 // sh 'find . -user root -name * | xargs chmod ugo+rw || true'
                 sh '''
+                chmod ugo+rw /data/workspace/JBOX/kinetic-configuration/
                 rm -rf /data/workspace/JBOX/kinetic-configuration/
                 '''
                 }
                 docker.image('docker-registry.toolchain.c2il.org/factory/fortify-sca:latest').inside("-u root") {
                 // sh 'find . -user root -name * | xargs chmod ugo+rw || true'
                 sh '''
+                chmod ugo+rw /data/workspace/JBOX/kinetic-configuration/
                 rm -rf /data/workspace/JBOX/kinetic-configuration/
                 '''
                 }
