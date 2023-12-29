@@ -130,14 +130,14 @@ pipeline {
                 // sh 'find . -user root -name * | xargs chmod ugo+rw || true'
                 sh '''
                 pwd
-                chmod -R 766 *
+                chmod -R 766 \'*\'
                 '''
                 }
                 docker.image('docker-registry.toolchain.c2il.org/factory/fortify-sca:latest').inside("-u root") {
                 // sh 'find . -user root -name * | xargs chmod ugo+rw || true'
                 sh '''
                 pwd
-                chmod -R 766 *
+                chmod -R 766 \'*\'
                 '''
                 }
             }
