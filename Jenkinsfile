@@ -129,19 +129,13 @@ pipeline {
                 docker.image('docker-registry.toolchain.c2il.org/factory/jbox/ubi8-metacop:latest').inside("-u root") {
                 // sh 'find . -user root -name * | xargs chmod ugo+rw || true'
                 sh '''
-                pwd
-                whoami
-                ls -l
-                chmod -R 766 /data/workspace/JBOX/kinetic-configuration/
+                rm -rf /data/workspace/JBOX/kinetic-configuration/
                 '''
                 }
                 docker.image('docker-registry.toolchain.c2il.org/factory/fortify-sca:latest').inside("-u root") {
                 // sh 'find . -user root -name * | xargs chmod ugo+rw || true'
                 sh '''
-                pwd
-                whoami
-                ls -l
-                chmod -R 766 /data/workspace/JBOX/kinetic-configuration/
+                rm -rf /data/workspace/JBOX/kinetic-configuration/
                 '''
                 }
             }
