@@ -49,6 +49,7 @@ pipeline {
                     fortifyclient -debug -url https://fortify.toolchain.c2il.org/ -authtoken $AUTHTOKEN uploadFPR -file /opt/kinetic-configuration/$FPRNAME -project "$PROJECT_NAME" -applicationVersion "$PROJECT_VERSION"
                     '''
                 }
+                cleanws()
             }
         }
         stage('Docker Build and Deploy') {
@@ -116,6 +117,7 @@ pipeline {
                         sh '''
                          aws s3 cp --recursive /opt/kinetic-configuration/export ${BUCKET_NAME} --region us-gov-west-1
                         '''
+                        cleanws()
                     }
                 }
             }
