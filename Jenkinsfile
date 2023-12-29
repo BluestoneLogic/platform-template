@@ -128,11 +128,17 @@ pipeline {
             script {
                 docker.image('docker-registry.toolchain.c2il.org/factory/jbox/ubi8-metacop:latest').inside("-u root") {
                 // sh 'find . -user root -name * | xargs chmod ugo+rw || true'
-                sh 'chmod 766 *'
+                sh '''
+                pwd
+                chmod -R 766 *
+                '''
                 }
                 docker.image('docker-registry.toolchain.c2il.org/factory/fortify-sca:latest').inside("-u root") {
                 // sh 'find . -user root -name * | xargs chmod ugo+rw || true'
-                sh 'chmod 766 *'
+                sh '''
+                pwd
+                chmod -R 766 *
+                '''
                 }
             }
         }
