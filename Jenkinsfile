@@ -91,7 +91,7 @@ pipeline {
                         envsubst < config/servername_environment_export_config.yml > config/export.yml
 
                         ruby ./export.rb -c config/export.yml
-                        chmod -R 777 /opt/kinetic-configuration/export/* 
+                        chmod -R 777 ./export/* 
                         '''
                     }
                 }
@@ -128,9 +128,11 @@ pipeline {
             script {
                 docker.image('docker-registry.toolchain.c2il.org/factory/jbox/ubi8-metacop:latest').inside("-u root") {
                 sh 'find . -user root -name \'*\' | xargs chmod ugo+rw || true'
+                cleanws()
                 }
                 docker.image('docker-registry.toolchain.c2il.org/factory/fortify-sca:latest').inside("-u root") {
                 sh 'find . -user root -name \'*\' | xargs chmod ugo+rw || true'
+                cleanws()
                 }
             }
         }
