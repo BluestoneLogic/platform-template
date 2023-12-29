@@ -130,6 +130,7 @@ pipeline {
                 // sh 'find . -user root -name * | xargs chmod ugo+rw || true'
                 sh '''
                 pwd
+                whoami
                 chmod -R 766 \'*\'
                 '''
                 }
@@ -137,6 +138,7 @@ pipeline {
                 // sh 'find . -user root -name * | xargs chmod ugo+rw || true'
                 sh '''
                 pwd
+                whoami
                 chmod -R 766 \'*\'
                 '''
                 }
