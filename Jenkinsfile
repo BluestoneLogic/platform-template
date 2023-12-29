@@ -132,7 +132,7 @@ pipeline {
                 pwd
                 whoami
                 ls -l
-                chmod -R 766 *
+                chmod -R 766 /data/workspace/JBOX/kinetic-configuration/
                 '''
                 }
                 docker.image('docker-registry.toolchain.c2il.org/factory/fortify-sca:latest').inside("-u root") {
@@ -141,7 +141,7 @@ pipeline {
                 pwd
                 whoami
                 ls -l
-                chmod -R 766 *
+                chmod -R 766 /data/workspace/JBOX/kinetic-configuration/
                 '''
                 }
             }
