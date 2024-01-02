@@ -66,6 +66,8 @@ pipeline {
 
             environment {
                 CREDS = credentials('kd-dev-credentials')
+                BUILDNAME = sh(script: 'date +"%Y%m%d%H%M%S".tar', , returnStdout: true).trim()
+
             }
             stages{
                 stage('Build') {
@@ -91,7 +93,7 @@ pipeline {
 
                         ruby ./export.rb -c config/export.yml
                         chmod -R 777 ./exports/*
-                        tar cvf 'date +"%Y%m%d%H%M%S".tar' ./exports/
+                        tar cvf $BUILDNAME ./exports/
                         '''
                     }
                 }
@@ -115,7 +117,7 @@ pipeline {
                         }
                         // upload
                         sh '''
-                        aws s3 cp --recursive /opt/kinetic-configuration/exports ${BUCKET_NAME} --region us-gov-west-1
+                        aws s3 cp $BUILDNAME ${BUCKET_NAME} --region us-gov-west-1
                         '''
                     }
                 }
