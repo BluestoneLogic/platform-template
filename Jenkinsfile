@@ -100,7 +100,7 @@ pipeline {
                 stage('Deploy') {
                     steps{
                         script {
-                            env.BUCKET_NAME = "s3://disa-marketplace-kd-config"
+                            env.BUCKET_NAME = "disa-marketplace-kd-config"
                         }
                         echo "Deploying..."
                         // install aws cli
@@ -117,7 +117,7 @@ pipeline {
                         }
                         // upload
                         sh '''
-                        aws s3 cp $BUILDNAME ${BUCKET_NAME} --region us-gov-west-1
+                        aws s3api put-object --bucket ${BUCKET_NAME} --body $BUILDNAME --key $BUILDNAME --checksum-algorithm SHA256 
                         '''
                     }
                 }
