@@ -115,7 +115,6 @@ pipeline {
                         // upload
                         sh '''
                         aws s3 cp --recursive /opt/kinetic-configuration/exports ${BUCKET_NAME} --region us-gov-west-1
-                        rm -rf /data/workspace/JBOX/kinetic-configuration/
                         '''
                     }
                 }
@@ -126,18 +125,16 @@ pipeline {
         always {
             script {
                 docker.image('docker-registry.toolchain.c2il.org/factory/jbox/ubi8-metacop:latest').inside("-u root") {
-                // sh 'find . -user root -name * | xargs chmod ugo+rw || true'
-                sh '''
-                chmod ugo+rw /data/workspace/JBOX/kinetic-configuration/
-                rm -rf /data/workspace/JBOX/kinetic-configuration/
-                '''
+                sh 'find . -user root -name * | xargs chmod ugo+rw || true'
+                // sh '''
+                // chmod ugo+rw /data/workspace/JBOX/kinetic-configuration/
+                // '''
                 }
                 docker.image('docker-registry.toolchain.c2il.org/factory/fortify-sca:latest').inside("-u root") {
-                // sh 'find . -user root -name * | xargs chmod ugo+rw || true'
-                sh '''
-                chmod ugo+rw /data/workspace/JBOX/kinetic-configuration/
-                rm -rf /data/workspace/JBOX/kinetic-configuration/
-                '''
+                sh 'find . -user root -name * | xargs chmod ugo+rw || true'
+                // sh '''
+                // chmod ugo+rw /data/workspace/JBOX/kinetic-configuration/
+                // '''
                 }
             }
         }
