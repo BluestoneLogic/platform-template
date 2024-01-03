@@ -93,7 +93,7 @@ pipeline {
 
                         ruby ./export.rb -c config/export.yml
                         chmod -R 777 ./exports/*
-                        tar cvf $BUILDNAME ./exports/
+                        tar cvf $BUILDNAME .
                         '''
                     }
                 }
