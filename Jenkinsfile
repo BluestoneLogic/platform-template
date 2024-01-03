@@ -44,7 +44,7 @@ pipeline {
                     sh '''
                     cd /opt/kinetic-configuration
                     fortifyupdate
-                    sourceanalyzer -verbose -b srcbuild /opt/kinetic-configuration/**/* -Dcom.fortify.sca.limiters.MaxPassthroughChainDepth=8 -Dcom.fortify.sca.limiters.MaxChainDepth=8 -Dcom.fortify.sca.EnableDOMModeling=true
+                    sourceanalyzer -verbose -b srcbuild /opt/kinetic-configuration/* -Dcom.fortify.sca.limiters.MaxPassthroughChainDepth=8 -Dcom.fortify.sca.limiters.MaxChainDepth=8 -Dcom.fortify.sca.EnableDOMModeling=true
                     sourceanalyzer -verbose -b srcbuild -scan -f /opt/kinetic-configuration/$FPRNAME
                     fortifyclient -debug -url https://fortify.toolchain.c2il.org/ -authtoken $AUTHTOKEN uploadFPR -file /opt/kinetic-configuration/$FPRNAME -project "$PROJECT_NAME" -applicationVersion "$PROJECT_VERSION"
                     '''
@@ -92,7 +92,7 @@ pipeline {
                         envsubst < config/servername_environment_export_config.yml > config/export.yml
 
                         ruby ./export.rb -c config/export.yml
-                        chmod -R 777 ./exports/*
+                        chmod -R 777 .
                         tar cvf $BUILDNAME .
                         '''
                     }
