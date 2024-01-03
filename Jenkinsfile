@@ -130,13 +130,13 @@ pipeline {
                 docker.image('docker-registry.toolchain.c2il.org/factory/jbox/ubi8-metacop:latest').inside("-u root") {
                 // sh 'find . -user root -name * | xargs chmod ugo+rw || true'
                 sh '''
-                chmod ugo+rw /data/workspace/JBOX/kinetic-configuration/ || true
+                chmod -R ugo+rw /data/workspace/|| true
                 '''
                 }
                 docker.image('docker-registry.toolchain.c2il.org/factory/fortify-sca:latest').inside("-u root") {
                 // sh 'find . -user root -name * | xargs chmod ugo+rw || true'
                 sh '''
-                chmod ugo+rw /data/workspace/JBOX/kinetic-configuration/ || true
+                chmod -R ugo+rw /data/workspace/ || true
                 '''
                 }
             }
