@@ -6,7 +6,7 @@ def branchVariables = [
     ],
     "origin/dev": [
         "serverURL": "https://bluestone-dev.kinops.io",
-        "slugName": "bluestone-logic",
+        "slugName": "bluestone-dev",
         "spaceName": "Bluestone Logic"
     ]
 ]
