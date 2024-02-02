@@ -36,10 +36,6 @@ pipeline {
             }
             steps {
                 echo "Beginning Fortify scan..."
-                // steps for test here
-                // echo 'Delaying Fortify scan start for 5 minutes due to Comms Topology app network bandwidth'
-                // sleep 480
-                // ! the latest fortify is on a rhel 8 minimal install, so uses microdnf instead of yum
                 withCredentials([string(credentialsId: 'fortify_authtoken', variable: 'AUTHTOKEN')]) {
                     sh '''
                     cd /opt/kinetic-configuration
@@ -67,6 +63,9 @@ pipeline {
             }
 
             stages{
+                environment {
+                    BUILDNAME = sh(script: 'date +"%Y%m%d%H%M%S".tar', , returnStdout: true).trim()
+                }
                 stage('Build') {
                     steps {
                         script {
@@ -77,6 +76,10 @@ pipeline {
                         }
                         echo "Running a build..."
                         sh '''
+                        cd /opt/kinetic-configuration
+                        yum install @ruby:3.1 gettext -y
+                        gem install bundler
+                        gem install rexml
                         bundle install
                         '''
                         withCredentials([usernamePassword(credentialsId: 'kd-dev-credentials', usernameVariable: "USERNAME", passwordVariable:"B64PASSWORD")]) {
@@ -86,7 +89,9 @@ pipeline {
                         }
 
                         sh '''
-                        ruby ./export.rb config/export.yml
+                        ruby ./export.rb -c config/export.yml
+                        chmod -R 777 .
+                        tar cvf $BUILDNAME .
                         '''
                     }
                 }
@@ -121,10 +126,16 @@ pipeline {
         always {
             script {
                 docker.image('docker-registry.toolchain.c2il.org/factory/jbox/ubi8-metacop:latest').inside("-u root") {
-                sh 'find . -user root -name \'*\' | xargs chmod ugo+rw || true'
+                // sh 'find . -user root -name * | xargs chmod ugo+rw || true'
+                sh '''
+                chmod -R ugo+rw /data/workspace/|| true
+                '''
                 }
                 docker.image('docker-registry.toolchain.c2il.org/factory/fortify-sca:latest').inside("-u root") {
-                sh 'find . -user root -name \'*\' | xargs chmod ugo+rw || true'
+                // sh 'find . -user root -name * | xargs chmod ugo+rw || true'
+                sh '''
+                chmod -R ugo+rw /data/workspace/ || true
+                '''
                 }
             }
         }
