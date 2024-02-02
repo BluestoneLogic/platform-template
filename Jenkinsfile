@@ -31,9 +31,6 @@ pipeline {
                     reuseNode true
                 }
             }
-            environment {
-               FPRNAME = sh(script: 'date +"%Y%m%d%H%M%S".fpr', , returnStdout: true).trim()
-            }
             steps {
                 echo "Beginning Fortify scan..."
                 withCredentials([string(credentialsId: 'fortify_authtoken', variable: 'AUTHTOKEN')]) {
@@ -63,9 +60,6 @@ pipeline {
             }
 
             stages{
-                environment {
-                    BUILDNAME = sh(script: 'date +"%Y%m%d%H%M%S".tar', , returnStdout: true).trim()
-                }
                 stage('Build') {
                     steps {
                         script {
