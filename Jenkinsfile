@@ -66,9 +66,6 @@ pipeline {
                 }
             }
 
-            environment {
-                CREDS = credentials('kd-nick-credentials')
-            }
             stages{
                 stage('Build') {
                     steps {
@@ -81,11 +78,14 @@ pipeline {
                         echo "Running a build..."
                         sh '''
                         bundle install
-                        export serviceUsername=$CREDS_USR
-                        export servicePassword=$(echo -n $CREDS_PSW | base64)
+                        '''
+                        withCredentials([usernamePassword(credentialsId: 'kd-dev-credentials', usernameVariable: "USERNAME", passwordVariable:"PASSWORD")]) {
+                            sh("export serviceUsername=$USERNAME")
+                            sh("export servicePassword=$(echo -n $PASSWORD | base64)")
+                            sh("envsubst < config/servername_environment_export_config.yml > config/export.yml")
+                        }
 
-                        envsubst < config/servername_environment_export_config.yml > config/export.yml
-
+                        sh '''
                         ruby ./export.rb config/export.yml
                         '''
                     }
