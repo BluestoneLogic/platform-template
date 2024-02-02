@@ -239,26 +239,26 @@ destinationUserProfileAttributeArray.each { | attribute |
 # Update Team Attributes
 # ------------------------------------------------------------------------------
 
-sourceTeamAttributeArray = []
-destinationTeamAttributeArray = (space_sdk.find_team_attribute_definitions().content['teamAttributeDefinitions']|| {}).map { |definition|  definition['name']}
+# sourceTeamAttributeArray = []
+# destinationTeamAttributeArray = (space_sdk.find_team_attribute_definitions().content['teamAttributeDefinitions']|| {}).map { |definition|  definition['name']}
 
-if File.file?(file = "#{core_path}/space/teamAttributeDefinitions.json")
-  teamAttributeDefinitions = JSON.parse(File.read(file))
-  teamAttributeDefinitions.each { |attribute|
-      if destinationTeamAttributeArray.include?(attribute['name'])
-        space_sdk.update_team_attribute_definition(attribute['name'], attribute)
-      else
-        space_sdk.add_team_attribute_definition(attribute['name'], attribute['description'], attribute['allowsMultiple'])
-      end
-      sourceTeamAttributeArray.push(attribute['name'])
-  }  
-end
+# if File.file?(file = "#{core_path}/space/teamAttributeDefinitions.json")
+#   teamAttributeDefinitions = JSON.parse(File.read(file))
+#   teamAttributeDefinitions.each { |attribute|
+#       if destinationTeamAttributeArray.include?(attribute['name'])
+#         space_sdk.update_team_attribute_definition(attribute['name'], attribute)
+#       else
+#         space_sdk.add_team_attribute_definition(attribute['name'], attribute['description'], attribute['allowsMultiple'])
+#       end
+#       sourceTeamAttributeArray.push(attribute['name'])
+#   }  
+# end
 
-destinationTeamAttributeArray.each { | attribute |
-  if vars["options"]["delete"] && !sourceTeamAttributeArray.include?(attribute)
-      space_sdk.delete_team_attribute_definition(attribute)
-  end
-}
+# destinationTeamAttributeArray.each { | attribute |
+#   if vars["options"]["delete"] && !sourceTeamAttributeArray.include?(attribute)
+#       space_sdk.delete_team_attribute_definition(attribute)
+#   end
+# }
 
 
 # ------------------------------------------------------------------------------
