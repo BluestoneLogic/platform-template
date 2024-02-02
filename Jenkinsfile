@@ -80,8 +80,8 @@ pipeline {
                         bundle install
                         '''
                         withCredentials([usernamePassword(credentialsId: 'kd-dev-credentials', usernameVariable: "USERNAME", passwordVariable:"PASSWORD")]) {
-                            sh("export serviceUsername=$USERNAME")
-                            sh("export servicePassword=$(echo -n $PASSWORD | base64)")
+                            sh("export serviceUsername=${USERNAME}")
+                            sh("export servicePassword=$(echo -n ${PASSWORD} | base64)")
                             sh("envsubst < config/servername_environment_export_config.yml > config/export.yml")
                         }
 
