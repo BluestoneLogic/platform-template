@@ -24,7 +24,7 @@ pipeline {
                     args '''
                     -v ${workspace}:/opt/kinetic-configuration
                     -e PROJECT_NAME="JBOX"
-                    -e PROJECT_VERSION="DMP Platform Template"
+                    -e PROJECT_VERSION="DMP Platform Template 0.1"
                     -e PATH="$PATH:/app/sca/bin:/app/scatools/bin:/usr/local/bin"
                     -u root
                     '''
