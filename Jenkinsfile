@@ -79,10 +79,9 @@ pipeline {
                         sh '''
                         bundle install
                         '''
-                        withCredentials([usernamePassword(credentialsId: 'kd-dev-credentials', usernameVariable: "USERNAME", passwordVariable:"PASSWORD")]) {
-                            def b64pw = sh(script:"echo -n ${PASSWORD} | base64", returnStdout:true).trim()
+                        withCredentials([usernamePassword(credentialsId: 'kd-dev-credentials', usernameVariable: "USERNAME", passwordVariable:"B64PASSWORD")]) {
                             sh("export serviceUsername=${USERNAME}")
-                            sh("export servicePassword=${b64pw}")
+                            sh("export servicePassword=${B64PASSWORD}")
                             sh("envsubst < config/servername_environment_export_config.yml > config/export.yml")
                         }
 
