@@ -15,6 +15,8 @@ pipeline {
     agent any
     environment {
         FPRNAME = sh(script: 'date +"%Y%m%d%H%M%S".fpr', , returnStdout: true).trim()
+        BUILDNAME = sh(script: 'date +"%Y%m%d%H%M%S".tar', , returnStdout: true).trim()
+
     }
     stages {
         stage('Fortify') {
@@ -37,7 +39,7 @@ pipeline {
                     sh '''
                     cd /opt/kinetic-configuration
                     fortifyupdate
-                    sourceanalyzer -verbose -b srcbuild -exclude "/opt/kinetic-configuration/build/static/js/*.chunk.js" /opt/kinetic-configuration/**/* -Dcom.fortify.sca.limiters.MaxPassthroughChainDepth=8 -Dcom.fortify.sca.limiters.MaxChainDepth=8 -Dcom.fortify.sca.EnableDOMModeling=true
+                    sourceanalyzer -verbose -b srcbuild /opt/kinetic-configuration/* -Dcom.fortify.sca.limiters.MaxPassthroughChainDepth=8 -Dcom.fortify.sca.limiters.MaxChainDepth=8 -Dcom.fortify.sca.EnableDOMModeling=true
                     sourceanalyzer -verbose -b srcbuild -scan -f /opt/kinetic-configuration/$FPRNAME
                     fortifyclient -debug -url https://fortify.toolchain.c2il.org/ -authtoken $AUTHTOKEN uploadFPR -file /opt/kinetic-configuration/$FPRNAME -project "$PROJECT_NAME" -applicationVersion "$PROJECT_VERSION"
                     '''
@@ -50,8 +52,6 @@ pipeline {
                     image 'docker-registry.toolchain.c2il.org/factory/jbox/ubi8-metacop:latest'
                     args '''
                         -v ${workspace}:/opt/kinetic-configuration
-                        -e PATH="$PATH:/opt/node/node-v16.13.2-linux-x64/bin:/usr/sbin"
-                        -e NODE_OPTIONS="--max-old-space-size=4096"
                         --network host
                         -u root
                     '''
@@ -92,7 +92,7 @@ pipeline {
                 stage('Deploy') {
                     steps{
                         script {
-                            env.BUCKET_NAME = "s3://disa-marketplace-kd-config"
+                            env.BUCKET_NAME = "disa-marketplace-kd-config"
                         }
                         echo "Deploying..."
                         // install aws cli
@@ -109,7 +109,7 @@ pipeline {
                         }
                         // upload
                         sh '''
-                         aws s3 cp --recursive /opt/kinetic-configuration/export ${BUCKET_NAME} --region us-gov-west-1
+                        aws s3api put-object --bucket ${BUCKET_NAME} --body $BUILDNAME --key $BUILDNAME --checksum-algorithm SHA256 
                         '''
                     }
                 }
