@@ -82,7 +82,7 @@ pipeline {
                         bundle install
 
                         export serviceUsername=$KD_CREDS_USR
-                        export servicePassword=$KD_CREDS_PSW
+                        export servicePassword=$(echo -n $KD_CREDS_PSW | base64)
                         envsubst < config/servername_environment_export_config.yml > config/export.yml
 
                         ruby ./export.rb -c config/export.yml
