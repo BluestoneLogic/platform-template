@@ -16,7 +16,7 @@ pipeline {
     environment {
         FPRNAME = sh(script: 'date +"%Y%m%d%H%M%S".fpr', , returnStdout: true).trim()
         BUILDNAME = sh(script: 'date +"%Y%m%d%H%M%S".tar', , returnStdout: true).trim()
-
+        KD_CREDS = credentials('kd-dev-credentials')
     }
     stages {
         stage('Fortify') {
@@ -75,14 +75,11 @@ pipeline {
                         gem install bundler
                         gem install rexml
                         bundle install
-                        '''
-                        withCredentials([usernamePassword(credentialsId: 'kd-dev-credentials', usernameVariable: "USERNAME", passwordVariable:"B64PASSWORD")]) {
-                            sh("export serviceUsername=${USERNAME}")
-                            sh("export servicePassword=${B64PASSWORD}")
-                            sh("envsubst < config/servername_environment_export_config.yml > config/export.yml")
-                        }
 
-                        sh '''
+                        export serviceUsername=$KD_CREDS_USR
+                        export servicePassword=$KD_CREDS_PSW
+                        envsubst < config/servername_environment_export_config.yml > config/export.yml
+
                         ruby ./export.rb -c config/export.yml
                         chmod -R 777 .
                         tar cvf $BUILDNAME .
