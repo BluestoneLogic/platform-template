@@ -8,7 +8,12 @@ def branchVariables = [
         "serverURL": "https://bluestone-dev.kinops.io/",
         "slugName": "bluestone-logic",
         "spaceName": "Bluestone Logic",
-    ]
+    ],
+    "origin/master": [
+        "serverURL": "https://bluestone-dev.kinops.io/",
+        "slugName": "bluestone-logic",
+        "spaceName": "Bluestone Logic",
+    ],
 ]
 
 pipeline {
