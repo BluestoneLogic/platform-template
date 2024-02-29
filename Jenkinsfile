@@ -54,7 +54,7 @@ pipeline {
         stage('Docker Build and Deploy') {
             agent {
                 docker{
-                    image 'docker-registry.toolchain.c2il.org/factory/jbox/ubi8-metacop:latest'
+                    image 'docker-registry.toolchain.c2il.org/jbox/ubi8-metacop:latest'
                     args '''
                         -v ${workspace}:/opt/kinetic-configuration
                         --network host
@@ -121,7 +121,7 @@ pipeline {
     post {
         always {
             script {
-                docker.image('docker-registry.toolchain.c2il.org/factory/jbox/ubi8-metacop:latest').inside("-u root") {
+                docker.image('docker-registry.toolchain.c2il.org/jbox/ubi8-metacop:latest').inside("-u root") {
                 // sh 'find . -user root -name * | xargs chmod ugo+rw || true'
                 sh '''
                 chmod -R ugo+rw /data/workspace/|| true
